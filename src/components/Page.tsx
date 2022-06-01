@@ -3,6 +3,7 @@ import { FastestLapChart } from './FastestLapChart';
 import { F1DataFastestLapsDto } from '../models/f1-data-response.dto';
 import { dataService } from '../services/data.service';
 import { F1DataDto } from '../models/f1-data.dto';
+import { FormControl } from '@mui/material';
 
 export const Page: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
@@ -27,6 +28,10 @@ export const Page: React.FC = () => {
 
     getData();
   }, []);
-  return <FastestLapChart loading={loading} data={data}/>
+  return (
+    <FormControl fullWidth>
+      <FastestLapChart loading={loading} data={data}/>
+    </FormControl>
+  )
 };
 
