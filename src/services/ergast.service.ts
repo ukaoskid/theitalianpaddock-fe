@@ -5,19 +5,19 @@ const BASE_URL = 'http://ergast.com/api/f1';
 
 class ErgastService {
   getSeasons() {
-    return axios.get<ISeason>(`${BASE_URL}/seasons.json?limit=1000`);
+    return axios.get<ISeason>(`${BASE_URL}/seasons.json?limit=1000`).then((data: any) => data.data.MRData);
   }
 
   getCircuitsBySeason(year: number) {
-    return axios.get<ISeasonCircuits>(`${BASE_URL}/${year}/circuits.json?limit=1000`);
+    return axios.get<ISeasonCircuits>(`${BASE_URL}/${year}.json?limit=1000`).then((data: any) => data.data.MRData);
   }
 
   getRoundSeasonSchedule(year: number, round: number) {
-    return axios.get<IRoundSeasonSchedule>(`${BASE_URL}/${year}/${round}.json?limit=1000`);
+    return axios.get<IRoundSeasonSchedule>(`${BASE_URL}/${year}/${round}.json?limit=1000`).then((data: any) => data.data.MRData);
   }
 
   getDriversByRoundBySeason(year: number, round: number) {
-    return axios.get<IRoundSeasonDrivers>(`${BASE_URL}/${year}/${round}/drivers.json?limit=1000`);
+    return axios.get<IRoundSeasonDrivers>(`${BASE_URL}/${year}/${round}/drivers.json?limit=1000`).then((data: any) => data.data.MRData);
   }
 }
 

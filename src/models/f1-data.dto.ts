@@ -4,6 +4,6 @@ export interface F1DataDto {
   year: number;
   track: number;
   session: 'Q' | 'R';
-  drivers: TDriver[];
+  drivers: string[];
   metrics: TMetric[];
 }

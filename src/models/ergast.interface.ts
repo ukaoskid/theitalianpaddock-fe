@@ -67,6 +67,10 @@ export interface IRoundSeasonSchedule {
           date: string,
           time: string
         },
+        ThirdPractice: {
+          date: string,
+          time: string
+        },
         Sprint: {
           date: string,
           time: string

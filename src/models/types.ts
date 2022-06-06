@@ -1,5 +1,6 @@
 type TMetric = 'Speed' | 'Throttle' | 'Brake' | 'nGear' | 'RPM' | 'DRS';
-type TDriver = 'LEC' | 'SAI' | 'VER' | 'PER';
+type TDriver = string[];
 type TSession = 'Q' | 'R';
+type TComboData = { text: string; value: string | number; }
 
-export type { TMetric, TDriver, TSession }
+export type { TMetric, TDriver, TSession, TComboData }
