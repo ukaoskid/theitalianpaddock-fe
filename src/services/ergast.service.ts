@@ -5,7 +5,10 @@ const BASE_URL = 'http://ergast.com/api/f1';
 
 class ErgastService {
   getSeasons() {
-    return axios.get<ISeason>(`${BASE_URL}/seasons.json?limit=1000`).then((data: any) => data.data.MRData);
+    return axios.get<ISeason>(`${BASE_URL}/seasons.json?limit=1000`).then((data: any) => {
+      data.data.MRData.SeasonTable.Seasons = data.data.MRData.SeasonTable.Seasons.filter((season: { season: string; }) => Number(season.season) >= 2018);
+      return data.data.MRData;
+    });
   }
 
   getCircuitsBySeason(year: number) {

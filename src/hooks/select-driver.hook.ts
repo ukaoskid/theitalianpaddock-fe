@@ -9,7 +9,6 @@ export const useSelectDrivers = (year: string | undefined, round: string | undef
     const fetchDrivers = async () => {
       if (year && round) {
         const res = await ergastService.getDriversByRoundBySeason(Number(year), Number(round));
-        console.log('sess', res);
         setOptions(res);
       }
     };

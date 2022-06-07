@@ -8,21 +8,19 @@ export const useFastestLap = (year: number | undefined, track: number | undefine
 
   useEffect(() => {
     const fetchFastestLap = async () => {
-      console.log(year, track, session, drivers);
-      if (year && track && session && (drivers?.length > 0)) {
+      if ((year !== undefined) && (track !== undefined) && (session !== undefined) && (drivers?.length > 0)) {
         const res = await dataService.getFastestLaps({
-          year,
-          track,
+          year: Number(year),
+          track: Number(track),
           session,
           drivers,
           metrics: ['Speed', 'Throttle']
         })
-        console.log('data', res);
         setOptions(res.data);
       }
     };
     fetchFastestLap();
-  }, []);
+  }, [Number(year), Number(track), session, drivers]);
 
   return options;
 };
