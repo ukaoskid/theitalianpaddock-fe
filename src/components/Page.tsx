@@ -21,7 +21,7 @@ export const Page: React.FC = () => {
   const [valueSession, setValueSession] = React.useState();
   const [valueDrivers, setValueDrivers] = React.useState([]);
   const [valueChart, setValueChart] = React.useState();
-  // setLoading(true);
+  // setLoading(true);7890''ì
 
   const optionsYear = useSelectYear();
   const optionsRound = useSelectRound(valueYear);
