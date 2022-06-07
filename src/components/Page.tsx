@@ -8,6 +8,8 @@ import { useSelectSession } from '../hooks/select-session.hook';
 import { useSelectDrivers } from '../hooks/select-driver.hook';
 import { MultiSelectCombo } from './MultiSelectCombo';
 import { useFastestLap } from '../hooks/chart.hook';
+import { F1DataFastestLapsDto, F1DataResponseDto } from '../models/f1-data-response.dto';
+import { Button } from '@mui/material';
 
 export const Page: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
@@ -17,14 +19,15 @@ export const Page: React.FC = () => {
   const [valueSession, setValueSession] = React.useState();
   const [valueDrivers, setValueDrivers] = React.useState([]);
   const [valueChart, setValueChart] = React.useState();
+  const [valueButton, setValueButton] = React.useState(false);
   // setLoading(true);
 
   const optionsYear = useSelectYear();
   const optionsRound = useSelectRound(valueYear);
   const optionsSession = useSelectSession(valueYear, valueRound);
   const optionsDrivers = useSelectDrivers(valueYear, valueRound);
-  const optionsFastestLap = useFastestLap(valueYear, valueRound, valueSession, valueDrivers);
-
+  const optionsFastestLap = useFastestLap(valueYear, valueRound, valueSession, valueDrivers, valueButton);
+  console.log(valueButton);
 
   return (
     <div>
@@ -37,6 +40,7 @@ export const Page: React.FC = () => {
       <MultiSelectCombo data={driversToCombo(optionsDrivers)} label="Drivers" id="drivers"
                         value={valueDrivers}
                         onChange={(value: any) => setValueDrivers(typeof value === 'string' ? value.split(',') : value)}></MultiSelectCombo>
+      <Button onClick={() => setValueButton(true)}>Get data</Button>
       <FastestLapChart loading={false} data={optionsFastestLap?.data}/>
     </div>
   )
