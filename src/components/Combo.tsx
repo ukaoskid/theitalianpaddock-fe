@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 export const Combo: React.FC<{
   data: { text: string; value: string | number; }[],
@@ -10,15 +10,18 @@ export const Combo: React.FC<{
 }> = (props) => {
   return (
     <div>
-      <InputLabel id={`${props.id}-label`}>{props.label}</InputLabel>
-      <Select
-        labelId={`${props.id}-label`}
-        id={props.id}
-        value={props.value}
-        onChange={(event) => props.onChange?.(event.target.value)}
-      >
-        {props.data.map(element => <MenuItem value={element.value} key={element.value}>{element.text}</MenuItem>)}
-      </Select>
+      <FormControl fullWidth>
+        <InputLabel id={`${props.id}-label`}>{props.label}</InputLabel>
+        <Select
+          autoWidth
+          labelId={`${props.id}-label`}
+          id={props.id}
+          value={props.value}
+          onChange={(event) => props.onChange?.(event.target.value)}
+        >
+          {props.data.map(element => <MenuItem value={element.value} key={element.value}>{element.text}</MenuItem>)}
+        </Select>
+      </FormControl>
     </div>
   )
 }
