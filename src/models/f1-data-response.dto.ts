@@ -9,5 +9,6 @@ export interface F1DataFastestLapsDto {
   data: [{
     speed: number;
     distance: number;
+    driver?: string
   }];
 }

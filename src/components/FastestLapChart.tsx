@@ -22,16 +22,10 @@ export const FastestLapChart: React.FC<{ data?: F1DataFastestLapsDto[], loading:
       theme={VictoryTheme.material}
       containerComponent={<VictoryVoronoiContainer labels={({ datum }) => `${datum.driver}: ${datum.y}`}/>}
     >
-      <VictoryGroup
-        data={props.data[0].data.map(({ distance, speed }) => ({ x: distance, y: speed, driver: props.data?.[0].driver }))}
-      >
-        <VictoryLine style={{ data: { stroke: props.data[0].color, strokeWidth: 1 } }}/>
-      </VictoryGroup>
-      <VictoryGroup
-        data={props.data[1].data.map(({ distance, speed }) => ({ x: distance, y: speed, driver: props.data?.[1].driver }))}
-      >
-        <VictoryLine style={{ data: { stroke: props.data[1].color, strokeWidth: 1 } }}/>
-      </VictoryGroup>
+      {props.data.map(record => (<VictoryLine
+        style={{ data: { stroke: record.color, strokeWidth: 0.5 }}}
+        data={record.data.map(({ distance, speed, driver }) => ({ x: distance, y: speed, driver: record.driver }))}
+      />))}
     </VictoryChart>
   )
 };
