@@ -2,13 +2,14 @@ import { IRoundSeasonDrivers, IRoundSeasonSchedule, ISeason } from '../models/er
 import { TComboData } from '../models/types';
 
 export function seasonsToCombo(seasons: ISeason | undefined): TComboData[] {
-  const comboData: TComboData[] = [{ text: '...', value: '0' }];
+  const comboData: TComboData[] = [];
   if (seasons && seasons.SeasonTable) {
     comboData.push(...seasons.SeasonTable.Seasons.map(season => {
       return { value: season.season, text: season.season }
     }))
   }
-  return comboData
+  comboData.push({ text: '...', value: '0' });
+  return comboData.reverse()
 }
 
 export function roundsToCombo(rounds: IRoundSeasonSchedule | undefined): TComboData[] {
