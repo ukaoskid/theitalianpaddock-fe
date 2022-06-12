@@ -13,11 +13,11 @@ import { dataService } from '../services/data.service';
 import { LapsTimesChart } from './LapsTimesChart';
 import { TMetric } from '../models/types';
 
-const telemetryLayout: TMetric[][] = [
-  ['speed'],
-  ['throttle'],
-  ['brake', 'ngear'],
-  ['rpm', 'drs']
+const telemetryLayout: any[][] = [
+  [{ metric: 'speed', title: 'Speed' }],
+  [{ metric: 'throttle', titleL: 'Throttle' }],
+  [{ metric: 'brake', title: 'Brake' }, { metric: 'ngear', title: 'Gear' }],
+  [{ metric: 'rpm', title: 'RPM' }, { metric: 'drs', title: 'DRS' }]
 ]
 
 export const Page: React.FC = () => {
@@ -56,8 +56,8 @@ export const Page: React.FC = () => {
 
   const telemetryCharts: any[] = [];
   telemetryLayout.forEach(row => telemetryCharts.push(...row.map(metric => (
-    <Grid item xs={12 / row.length} key={metric}>
-      <FastestLapTelemetryChart loading={valueLoading} data={valueFastestLaps?.data} metric={metric} height={200}/>
+    <Grid item xs={12 / row.length} key={metric.metric}>
+      <FastestLapTelemetryChart loading={valueLoading} data={valueFastestLaps?.data} metric={metric.metric} height={200} title={metric.title}/>
     </Grid>
   ))));
 

@@ -64,9 +64,11 @@ const chartTheme = {
           padding: 25,
         },
         grid: {
-          fill: "none",
-          stroke: "none",
-          pointerEvents: "painted"
+          fill: "white",
+          stroke: "#2c2c2c",
+          strokeWidth: 0.5,
+          strokeDasharray: "5, 5",
+          pointerEvents: "painted",
         },
         ticks: {
           fill: "transparent",

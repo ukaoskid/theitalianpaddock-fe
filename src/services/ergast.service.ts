@@ -20,7 +20,7 @@ class ErgastService {
   }
 
   getDriversByRoundBySeason(year: number, round: number) {
-    return axios.get<IRoundSeasonDrivers>(`${BASE_URL}/${year}/${round}/drivers.json?limit=1000`).then((data: any) => data.data.MRData);
+    return axios.get<IRoundSeasonDrivers>(`${BASE_URL}/${year}/drivers.json?limit=1000`).then((data: any) => data.data.MRData);
   }
 }
 

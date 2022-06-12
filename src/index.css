@@ -13,3 +13,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.modal {
+  background-color: #404356;
+  border: 1px #d9d9d9;
+}

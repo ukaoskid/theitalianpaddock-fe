@@ -21,7 +21,8 @@ export const LapsTimesChart: React.FC<{ data?: F1DataLapTimesDto[], loading: boo
     <VictoryChart
       height={200}
       theme={chartTheme}
-      containerComponent={<VictoryVoronoiContainer voronoiDimension="x"
+      containerComponent={<VictoryVoronoiContainer mouseFollowTooltips
+                                                   voronoiDimension="x"
                                                    labelComponent={<VictoryLabel
                                                      style={{ fontSize: 7, fill: 'white' }}/>}
                                                    labels={({ datum }) => `${datum.driver}: ${msToTime(datum.y)}, ${datum.compound[0]}`}/>}
