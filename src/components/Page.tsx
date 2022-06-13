@@ -11,7 +11,6 @@ import { F1DataFastestLapsDto, F1DataLapTimesDto, F1DataResponseDto } from '../m
 import { Button, FormControl, Grid } from '@mui/material';
 import { dataService } from '../services/data.service';
 import { LapsTimesChart } from './LapsTimesChart';
-import { TMetric } from '../models/types';
 
 const telemetryLayout: any[][] = [
   [{ metric: 'speed', title: 'Speed' }],
