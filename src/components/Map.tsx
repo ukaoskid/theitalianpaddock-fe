@@ -1,6 +1,8 @@
 import React from 'react';
 import { Circle, GeoJSON, GeoJSONProps, MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import { GeoJsonObject } from 'geojson';
+import { Button } from '@mui/material';
+import { distance } from '../helpers/haversine.helper';
 
 const BAKU = {
   'type': 'FeatureCollection',
@@ -28,22 +30,63 @@ const BAKU = {
 }
 
 export const Map: React.FC = () => {
+  const [valueTurns, setValueTurns] = React.useState<any>([]);
+  const [valueTurnsDistances, setValueTurnsDistances] = React.useState<any>({});
+
+  const calculateTurnDistances = () => {
+    const relativeDistance: any[] = [];
+    const absoluteDistance: any[] = [];
+
+    valueTurns.reduce((p: any, c: any) => {
+      let cursor = 0;
+      let totDistance = 0;
+      for (let i = p - 1; i >= c; i--) {
+        totDistance += distance(coordinates[p - cursor][1], coordinates[p - cursor][0], coordinates[i][1], coordinates[i][0]);
+        cursor++;
+      }
+
+      relativeDistance.push(totDistance);
+      return c;
+    });
+
+    let totalDistance = 0;
+    relativeDistance.forEach(value => {
+      totalDistance += value;
+      absoluteDistance.push(totalDistance);
+    });
+
+    console.log(absoluteDistance);
+  }
+
   const circuit = BAKU as any;
+  const coordinates = circuit.features[0].geometry.coordinates;
+
   return (
-    <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <GeoJSON
-        attribution="Baku Circuit"
-        data={circuit}></GeoJSON>
-      {circuit.features[0].geometry.coordinates.reverse().map((loc: any, i: number) => (
-        <Circle center={[loc[1], loc[0]]} radius={4} color="red">
-          <Tooltip direction="right" offset={[0, 0]} opacity={1} permanent>{i}</Tooltip>
-          <Popup>{loc[1]}<br/>{loc[0]}<br/>{i}</Popup>
-        </Circle>
-      ))}
-    </MapContainer>
+    <div>
+      <Button onClick={calculateTurnDistances}>Calculate</Button>
+      <MapContainer center={[40.362639, 49.830927]} zoom={13} scrollWheelZoom={true}>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <GeoJSON
+          attribution="Baku Circuit"
+          data={circuit}></GeoJSON>
+        {coordinates.map((loc: any, i: number, array: any[]) => (
+          <div>
+            <Circle center={[loc[1], loc[0]]} radius={4} color="red" eventHandlers={{
+              click: (e) => {
+                valueTurns.push(i);
+                setValueTurns(valueTurns);
+                console.log('marker clicked', valueTurns)
+              }
+            }}>
+              <Popup>{loc[1]}<br/>{loc[0]}<br/>{i}</Popup>
+            </Circle>
+          </div>
+        ))}
+      </MapContainer>
+    </div>
+
   )
 }

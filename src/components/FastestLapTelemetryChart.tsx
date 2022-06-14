@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   VictoryAxis,
-  VictoryChart, VictoryLabel, VictoryLegend, VictoryLine, VictoryTheme,
+  VictoryChart, VictoryLabel, VictoryLegend, VictoryLine,
   VictoryVoronoiContainer
 } from 'victory';
 import { F1DataFastestLapsDto } from '../models/f1-data-response.dto';
@@ -24,6 +24,7 @@ export const FastestLapTelemetryChart: React.FC<{ data?: F1DataFastestLapsDto[],
 
   const legendData = props.data.map(chart => ({ name: chart.driver }));
   const legendColors = props.data.map(chart => chart.color);
+  const turns = [185, 519, 1383, 1604, 1942, 1998, 2393, 2588, 2611, 2659, 2685, 2755, 3140, 3351, 3596, 3945, 4119, 4382, 4540, 4887];
 
   const chart = (
     <div>
@@ -53,6 +54,16 @@ export const FastestLapTelemetryChart: React.FC<{ data?: F1DataFastestLapsDto[],
             driver: record.driver
           }))}
         />))}
+        {turns.map((turn, i) => {
+          const dy = i % 2 === 0 ? -3 : -10;
+          return (<VictoryLine
+            x={() => turn}
+            style={{ data: { stroke: '#ff7961', strokeWidth: 0.5, opacity: '20%' }, labels: { fontSize: 5 }}}
+            samples={1}
+            labels={['', `${i + 1}`]}
+            labelComponent={<VictoryLabel renderInPortal dx={0} dy={dy}/>}
+          />)
+        })}
         <VictoryAxis fixLabelOverlap label="Distance (m)"/>
         <VictoryAxis fixLabelOverlap dependentAxis label={`${props.metric}`}/>
       </VictoryChart>
