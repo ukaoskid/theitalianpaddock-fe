@@ -1,18 +1,27 @@
 import React, { useEffect } from 'react';
-import { Circle, GeoJSON, MapContainer, Popup, TileLayer } from 'react-leaflet'
-import { Button, Select } from '@mui/material';
+import { Circle, GeoJSON, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet'
+import { Button } from '@mui/material';
 import { distance } from '../helpers/haversine.helper';
 import { Combo } from './Combo';
 import { EDITOR_CIRCUITS, JSON_CIRCUITS } from '../models/editor-circuits';
 import { TComboData } from '../models/types';
+import { LatLngBoundsExpression } from 'leaflet';
+
+const ChangeCenter: React.FC<{ position: LatLngBoundsExpression }> = (props) => {
+  const map = useMap();
+  map.flyToBounds(props.position, { animate: false });
+  map.setZoom(14);
+  return <></>;
+};
 
 export const Map: React.FC = () => {
-  const [valueTurns, setValueTurns] = React.useState<any>([]);
+  const [valueTurns, setTurns] = React.useState<any>([]);
   const [valueTurnsDistances, setValueTurnsDistances] = React.useState<any>({});
-  const [valueCircuit, setValueCircuit] = React.useState<any>();
-  const [valueCircuitGeoJson, setValueCircuitGeoJson] = React.useState<any>();
-  const [valueCircuitCoordinateSeries, setValueCircuitCoordinateSeries] = React.useState<any>([]);
-  const [valueMapKey, setValueMapKey] = React.useState<any>([0, 0]);
+  const [valueCircuit, setCircuit] = React.useState<any>();
+  const [valueCircuitGeoJson, setCircuitGeoJson] = React.useState<any>();
+  const [valueCircuitCoordinateSeries, setCircuitCoordinateSeries] = React.useState<any>([]);
+  const [valueMapCenter, setMapCenter] = React.useState<any>([[0, 0], [0, 0]]);
+  const [valueGeoJsonKey, setGeoJsonKey] = React.useState(Date.now().toString())
 
   const calculateTurnDistances = () => {
     const relativeDistance: any[] = [];
@@ -44,42 +53,46 @@ export const Map: React.FC = () => {
     console.log(absoluteDistance);
   }
 
-  const circuitsCombo: TComboData[] = EDITOR_CIRCUITS.map<TComboData>(circuit => ({ text: circuit.name, value: circuit.file }));
+  const circuitsCombo: TComboData[] = EDITOR_CIRCUITS.map<TComboData>(circuit => ({
+    text: circuit.name,
+    value: circuit.file
+  }));
 
   useEffect(() => {
     const loadGeoJson = async () => {
       if (valueCircuit) {
         const json: any = JSON_CIRCUITS[valueCircuit.replace('.json', '')];
-        setValueCircuitGeoJson(json);
-        setValueCircuitCoordinateSeries(json.features[0].geometry.coordinates);
-        setValueMapKey([json.bbox[0], json.bbox[1]]);
+        setCircuitGeoJson(json);
+        setCircuitCoordinateSeries(json.features[0].geometry.coordinates);
+        setMapCenter([json.bbox[1], json.bbox[0], [json.bbox[3], json.bbox[2]]]);
+        setGeoJsonKey(Date.now().toString());
       }
     }
 
     loadGeoJson();
-  }, []);
+  }, [valueCircuit]);
 
   return (
     <div>
-      <Combo data={circuitsCombo} label={'Circuits'} id={'circuits'} value={valueCircuit}
-             onChange={(value: any) => setValueCircuit(value)}>
+      <Combo data={circuitsCombo} label="Circuits" id="circuits" value={valueCircuit}
+             onChange={(value: any) => setCircuit(value)}>
       </Combo>
       <Button onClick={calculateTurnDistances}>Calculate</Button>
-      <MapContainer center={valueMapKey} zoom={16} scrollWheelZoom={true}>
+      <MapContainer center={[0, 0]} zoom={4} scrollWheelZoom={true}>
+        <ChangeCenter position={valueMapCenter}></ChangeCenter>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <GeoJSON
-          key={valueMapKey}
+          key={valueGeoJsonKey}
           attribution="Baku Circuit"
           data={valueCircuitGeoJson}></GeoJSON>
-        {valueCircuitCoordinateSeries.map((loc: any, i: number, array: any[]) => (
+        {valueCircuitCoordinateSeries.map((loc: any, i: number) => (
           <div>
             <Circle center={[loc[1], loc[0]]} radius={4} color="red" eventHandlers={{
               click: (e) => {
-                valueTurns.push(i);
-                setValueTurns(valueTurns);
+                setTurns((currentValue: any) => [...currentValue, i]);
                 console.log('marker clicked', valueTurns)
               }
             }}>
