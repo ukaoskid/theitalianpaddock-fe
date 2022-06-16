@@ -16,3 +16,16 @@ export function distance(lat1: number, lon1: number, lat2: number, lon2: number)
 function toRad(value: number) {
   return value * Math.PI / 180;
 }
+
+export function nearestPoint(coordinates: [number, number][], point: [number, number]): number {
+  const closest = { dist: 0, i: 0 };
+  coordinates.forEach((value, index) => {
+    const dist = distance(value[1], value[0], point[0], point[1]);
+    if (dist < closest.dist || index === 0) {
+      closest.dist = dist;
+      closest.i = index;
+    }
+  });
+
+  return closest.i;
+}

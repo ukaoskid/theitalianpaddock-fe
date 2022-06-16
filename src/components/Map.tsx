@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Circle, GeoJSON, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet'
-import { Button } from '@mui/material';
-import { distance } from '../helpers/haversine.helper';
+import { Circle, GeoJSON, MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { distance, nearestPoint } from '../helpers/haversine.helper';
 import { Combo } from './Combo';
 import { EDITOR_CIRCUITS, JSON_CIRCUITS } from '../models/editor-circuits';
 import { TComboData } from '../models/types';
 import { LatLngBoundsExpression } from 'leaflet';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const ChangeCenter: React.FC<{ position: LatLngBoundsExpression }> = (props) => {
   const map = useMap();
@@ -14,8 +15,15 @@ const ChangeCenter: React.FC<{ position: LatLngBoundsExpression }> = (props) => 
   return <></>;
 };
 
+const ClickLocator: React.FC<{ coordinates: [number, number][] }> = (props) => {
+  useMapEvents({
+    click: event => nearestPoint(props.coordinates, [event.latlng.lat, event.latlng.lng])
+  })
+  return <></>;
+};
+
 export const Map: React.FC = () => {
-  const [valueTurns, setTurns] = React.useState<any>([]);
+  const [valueTurns, setTurns] = React.useState<any[]>([]);
   const [valueTurnsDistances, setValueTurnsDistances] = React.useState<any>({});
   const [valueCircuit, setCircuit] = React.useState<any>();
   const [valueCircuitGeoJson, setCircuitGeoJson] = React.useState<any>();
@@ -75,11 +83,11 @@ export const Map: React.FC = () => {
   return (
     <div>
       <Combo data={circuitsCombo} label="Circuits" id="circuits" value={valueCircuit}
-             onChange={(value: any) => setCircuit(value)}>
-      </Combo>
+             onChange={(value: any) => setCircuit(value)}></Combo>
       <Button onClick={calculateTurnDistances}>Calculate</Button>
       <MapContainer center={[0, 0]} zoom={4} scrollWheelZoom={true}>
         <ChangeCenter position={valueMapCenter}></ChangeCenter>
+        <ClickLocator coordinates={valueCircuitCoordinateSeries}/>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -90,17 +98,29 @@ export const Map: React.FC = () => {
           data={valueCircuitGeoJson}></GeoJSON>
         {valueCircuitCoordinateSeries.map((loc: any, i: number) => (
           <div>
-            <Circle center={[loc[1], loc[0]]} radius={4} color="red" eventHandlers={{
-              click: (e) => {
-                setTurns((currentValue: any) => [...currentValue, i]);
-                console.log('marker clicked', valueTurns)
-              }
+            <Circle center={[loc[1], loc[0]]} radius={2} color="red" eventHandlers={{
+              click: (e) => setTurns((currentValue: any) => [...currentValue, i])
             }}>
-              <Popup>{loc[1]}<br/>{loc[0]}<br/>{i}</Popup>
             </Circle>
           </div>
         ))}
       </MapContainer>
+      <List dense={true}>
+        {valueTurns.map((turn, index) => (
+          <ListItem secondaryAction={
+            <IconButton edge="end" aria-label="delete" onClick={() => setTurns(currentValue => {
+              // make component
+              currentValue.splice(index, 1);
+              return currentValue;
+            })}>
+              <DeleteIcon/>
+            </IconButton>
+          }
+          >
+            <ListItemText primary={`${turn} T${index}`}/>
+          </ListItem>
+        ))}
+      </List>
     </div>
   )
 }
