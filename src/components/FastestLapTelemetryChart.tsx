@@ -24,7 +24,7 @@ export const FastestLapTelemetryChart: React.FC<{ data?: F1DataFastestLapsDto[],
 
   const legendData = props.data.map(chart => ({ name: chart.driver }));
   const legendColors = props.data.map(chart => chart.color);
-  const turns = [185, 519, 1383, 1604, 1942, 1998, 2393, 2588, 2611, 2659, 2685, 2755, 3140, 3351, 3596, 3945, 4119, 4382, 4540, 4887];
+  const turns = [100, 260, 624, 700, 915, 1120, 1230, 1840, 1967, 2550, 2650, 3113, 3730, 3846];
 
   const chart = (
     <div>

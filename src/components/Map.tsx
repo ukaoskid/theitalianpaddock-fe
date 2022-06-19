@@ -1,26 +1,12 @@
 import React, { useEffect } from 'react';
-import { Circle, GeoJSON, MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { Circle, GeoJSON, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet'
+import { Button } from '@mui/material';
 import { distance, nearestPoint } from '../helpers/haversine.helper';
 import { Combo } from './Combo';
 import { EDITOR_CIRCUITS, JSON_CIRCUITS } from '../models/editor-circuits';
 import { TComboData } from '../models/types';
-import { LatLngBoundsExpression } from 'leaflet';
-import DeleteIcon from '@mui/icons-material/Delete';
-
-const ChangeCenter: React.FC<{ position: LatLngBoundsExpression }> = (props) => {
-  const map = useMap();
-  map.flyToBounds(props.position, { animate: false });
-  map.setZoom(14);
-  return <></>;
-};
-
-const ClickLocator: React.FC<{ coordinates: [number, number][] }> = (props) => {
-  useMapEvents({
-    click: event => nearestPoint(props.coordinates, [event.latlng.lat, event.latlng.lng])
-  })
-  return <></>;
-};
+import { LatLngBoundsExpression, LatLngExpression } from 'leaflet';
+import { TurnList } from './TurnList';
 
 export const Map: React.FC = () => {
   const [valueTurns, setTurns] = React.useState<any[]>([]);
@@ -28,12 +14,37 @@ export const Map: React.FC = () => {
   const [valueCircuit, setCircuit] = React.useState<any>();
   const [valueCircuitGeoJson, setCircuitGeoJson] = React.useState<any>();
   const [valueCircuitCoordinateSeries, setCircuitCoordinateSeries] = React.useState<any>([]);
-  const [valueMapCenter, setMapCenter] = React.useState<any>([[0, 0], [0, 0]]);
+  const [valueCircuitBox, setCircuitBox] = React.useState<any>([[0, 0], [0, 0]]);
   const [valueGeoJsonKey, setGeoJsonKey] = React.useState(Date.now().toString())
+  const [valueZoom, setZoom] = React.useState<number>(14);
+  const [valueBoxCenter, setBoxCenter] = React.useState<LatLngExpression>();
+
+  const MapEventHandler: React.FC = () => {
+    useMapEvents({
+      click: event => console.log(nearestPoint(valueCircuitCoordinateSeries, [event.latlng.lat, event.latlng.lng])),
+      zoomend: event => {
+        setZoom(event.target._zoom);
+        setBoxCenter(event.target._center);
+      },
+      moveend: event => setBoxCenter(event.target._center)
+    })
+    return <></>;
+  };
+
+  const ChangeCenter: React.FC<{ position: LatLngBoundsExpression, center?: LatLngExpression }> = (props) => {
+    const map = useMap();
+    map.flyToBounds(props.position, { animate: false });
+    map.setZoom(valueZoom);
+    // if (props.center) {
+    //   console.log('c', props.center);
+    //   map.setView(props.center);
+    // }
+    return <></>;
+  };
 
   const calculateTurnDistances = () => {
     const relativeDistance: any[] = [];
-    const absoluteDistance: any[] = [];
+    const absoluteDistance: any[] = [0];
 
     valueTurns.reduce((p: any, c: any) => {
       let cursor = 0;
@@ -58,7 +69,20 @@ export const Map: React.FC = () => {
       absoluteDistance.push(totalDistance);
     });
 
-    console.log(absoluteDistance);
+    setValueTurnsDistances(absoluteDistance);
+  }
+
+  const handleTurnTooltip = (index: number) => {
+    const tIndex = valueTurns.indexOf(index);
+    if (tIndex !== -1) {
+      return (<Tooltip direction="right" offset={[0, 0]} opacity={1}
+                       permanent>{`${tIndex === 0 ? 'Start' : `T${tIndex}`}`}</Tooltip>);
+    }
+  }
+
+  const handleTurnsCopyToClipboard = async () => {
+    const text = `[${[...valueTurnsDistances].splice(1, valueTurnsDistances.length).join(', ')}]`;
+    await navigator.clipboard.writeText(text);
   }
 
   const circuitsCombo: TComboData[] = EDITOR_CIRCUITS.map<TComboData>(circuit => ({
@@ -66,28 +90,38 @@ export const Map: React.FC = () => {
     value: circuit.file
   }));
 
+  // GeoJson loading hook.
   useEffect(() => {
     const loadGeoJson = async () => {
       if (valueCircuit) {
         const json: any = JSON_CIRCUITS[valueCircuit.replace('.json', '')];
+        const clockwise = json.features[0].properties.clockwise;
+        const coordinates = clockwise ? json.features[0].geometry.coordinates.reverse() : json.features[0].geometry.coordinates;
         setCircuitGeoJson(json);
-        setCircuitCoordinateSeries(json.features[0].geometry.coordinates);
-        setMapCenter([json.bbox[1], json.bbox[0], [json.bbox[3], json.bbox[2]]]);
+        setCircuitCoordinateSeries(coordinates);
+        setCircuitBox([json.bbox[1], json.bbox[0], [json.bbox[3], json.bbox[2]]]);
         setGeoJsonKey(Date.now().toString());
+        // setTurns([json.features[0].geometry.coordinates.length - 1]);
       }
     }
 
     loadGeoJson();
   }, [valueCircuit]);
 
+  // Turns calculation hook.
+  useEffect(() => {
+    if (valueTurns.length > 0) {
+      calculateTurnDistances();
+    }
+  }, [valueTurns]);
+
   return (
     <div>
       <Combo data={circuitsCombo} label="Circuits" id="circuits" value={valueCircuit}
              onChange={(value: any) => setCircuit(value)}></Combo>
-      <Button onClick={calculateTurnDistances}>Calculate</Button>
-      <MapContainer center={[0, 0]} zoom={4} scrollWheelZoom={true}>
-        <ChangeCenter position={valueMapCenter}></ChangeCenter>
-        <ClickLocator coordinates={valueCircuitCoordinateSeries}/>
+      <MapContainer center={[0, 0]} scrollWheelZoom={true}>
+        <ChangeCenter position={valueCircuitBox} center={valueBoxCenter}></ChangeCenter>
+        <MapEventHandler/>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -98,29 +132,20 @@ export const Map: React.FC = () => {
           data={valueCircuitGeoJson}></GeoJSON>
         {valueCircuitCoordinateSeries.map((loc: any, i: number) => (
           <div>
-            <Circle center={[loc[1], loc[0]]} radius={2} color="red" eventHandlers={{
-              click: (e) => setTurns((currentValue: any) => [...currentValue, i])
+            <Circle center={[loc[1], loc[0]]} radius={3} color="red" eventHandlers={{
+              click: () => setTurns((currentValue: any) => [...currentValue, i])
             }}>
+              {handleTurnTooltip(i)}
             </Circle>
           </div>
         ))}
       </MapContainer>
-      <List dense={true}>
-        {valueTurns.map((turn, index) => (
-          <ListItem secondaryAction={
-            <IconButton edge="end" aria-label="delete" onClick={() => setTurns(currentValue => {
-              // make component
-              currentValue.splice(index, 1);
-              return currentValue;
-            })}>
-              <DeleteIcon/>
-            </IconButton>
-          }
-          >
-            <ListItemText primary={`${turn} T${index}`}/>
-          </ListItem>
-        ))}
-      </List>
+      <Button
+        onClick={handleTurnsCopyToClipboard}>Copy to clipboard</Button>
+      <TurnList turns={valueTurns} distances={valueTurnsDistances} handleTurns={turns => {
+        console.log('parent', turns);
+        setTurns(turns);
+      }}></TurnList>
     </div>
   )
 }
