@@ -163,7 +163,7 @@ const chartTheme = {
         data: {
           fill: "transparent",
           stroke: charcoal,
-          strokeWidth: 2
+          strokeWidth: 1
         },
         labels: baseLabelStyles
       }

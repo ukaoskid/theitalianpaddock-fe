@@ -1,4 +1,3 @@
-import './App.css'
 import { Page } from './components/Page';
 import React from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -11,7 +10,6 @@ const App: React.FC = () => {
       <CssBaseline enableColorScheme />
       <div style={{ margin: '1em' }}>
         <Page/>
-        <Map/>
       </div>
     </ThemeProvider>
   )

@@ -62,6 +62,7 @@ export const Page: React.FC = () => {
 
   return (
     <div>
+      <h1>The Italian Paddock - Telemetry</h1>
       <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={2} sm={4} md={4} key={'year'}>
           <Combo data={seasonsToCombo(optionsYear)} label="Year" id="year" value={valueYear}
@@ -87,9 +88,11 @@ export const Page: React.FC = () => {
         </Grid>
       </Grid>
       <Grid container spacing={1}>
+        <h2>Laps</h2>
         <Grid item xs={12} key={'lapstimes'}>
           <LapsTimesChart loading={valueLoading} data={valueLapsTimes?.data}/>
         </Grid>
+        <h2>Fastest Lap</h2>
         {telemetryCharts}
       </Grid>
     </div>
