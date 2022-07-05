@@ -38,6 +38,7 @@ export const LapsTimesChart: React.FC<{ data?: F1DataLapTimesDto[], loading: boo
                          data={legendData}
           />
           {props.data.map(record => (<VictoryLine
+            interpolation="cardinal"
             style={{ data: { stroke: record.color, strokeWidth: 0.5 } }}
             data={record.data.map((laps) => ({
               x: laps.lap,
