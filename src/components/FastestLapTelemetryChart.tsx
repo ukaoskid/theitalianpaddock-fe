@@ -35,21 +35,21 @@ export const FastestLapTelemetryChart: React.FC<{ data?: F1DataFastestLapsDto[],
           <VictoryChart
             height={props.height}
             theme={chartTheme}
-            containerComponent={
-              <VictoryCursorContainer
-                cursorDimension="x"
-                cursorLabelComponent={<VictoryLabel style={{fontSize: 7, fill: 'white'}}/>}
-                cursorLabel={({ datum }) => `${Math.round(datum.x)}`}
-              />
-            }
             // containerComponent={
-            //   <VictoryVoronoiContainer
-            //     mouseFollowTooltips
-            //     voronoiDimension="x"
-            //     voronoiPadding={5}
-            //     labelComponent={<VictoryLabel style={{fontSize: 7, fill: 'white'}}/>}
-            //     labels={({datum}) => `${datum.driver}: ${datum.y}`}
-            //   />}
+            //   <VictoryCursorContainer
+            //     cursorDimension="x"
+            //     cursorLabelComponent={<VictoryLabel style={{fontSize: 7, fill: 'white'}}/>}
+            //     cursorLabel={({ datum }) => `${Math.round(datum.x)}`}
+            //   />
+            // }
+            containerComponent={
+              <VictoryVoronoiContainer
+                mouseFollowTooltips
+                voronoiDimension="x"
+                voronoiPadding={5}
+                labelComponent={<VictoryLabel style={{fontSize: 7, fill: 'white'}}/>}
+                labels={({datum}) => `${datum.driver}: ${Math.round(datum.y)}`}
+              />}
           >
             <VictoryLegend orientation="horizontal"
                            gutter={20}
@@ -58,23 +58,13 @@ export const FastestLapTelemetryChart: React.FC<{ data?: F1DataFastestLapsDto[],
             />
             {props.data.map((record, i) => {
               return (<VictoryLine
-                // interpolation="cardinal"
+                interpolation="basis"
                 style={{data: {stroke: record.color, strokeWidth: 0.5}}}
                 data={record.data.map((metrics) => ({
                   x: metrics.distance,
                   y: metrics[props.metric],
                   driver: record.driver
                 }))}
-              />)
-            })}
-            {turns.map((turn, i) => {
-              const dy = i % 2 === 0 ? -3 : -10;
-              return (<VictoryLine
-                x={() => turn}
-                style={{data: {stroke: '#ff7961', strokeWidth: 0.5, opacity: '20%'}, labels: {fontSize: 5}}}
-                samples={1}
-                labels={['', `${i + 1}`]}
-                labelComponent={<VictoryLabel renderInPortal dx={0} dy={dy}/>}
               />)
             })}
             <VictoryAxis fixLabelOverlap label="Distance (m)"/>
