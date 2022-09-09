@@ -22,11 +22,11 @@ export const Map: React.FC = () => {
   const MapEventHandler: React.FC = () => {
     useMapEvents({
       click: event => console.log(nearestPoint(valueCircuitCoordinateSeries, [event.latlng.lat, event.latlng.lng])),
-      zoomend: event => {
-        setZoom(event.target._zoom);
-        setBoxCenter(event.target._center);
-      },
-      moveend: event => setBoxCenter(event.target._center)
+      // zoomend: event => {
+      //   setZoom(event.target._zoom);
+      //   setBoxCenter(event.target._center);
+      // },
+      // moveend: event => setBoxCenter(event.target._center)
     })
     return <></>;
   };
@@ -85,7 +85,7 @@ export const Map: React.FC = () => {
     await navigator.clipboard.writeText(text);
   }
 
-  const circuitsCombo: TComboData[] = EDITOR_CIRCUITS.map<TComboData>(circuit => ({
+  const circuitsCombo: TComboData[] = EDITOR_CIRCUITS().map<TComboData>(circuit => ({
     text: circuit.name,
     value: circuit.file
   }));
@@ -101,7 +101,7 @@ export const Map: React.FC = () => {
         setCircuitCoordinateSeries(coordinates);
         setCircuitBox([json.bbox[1], json.bbox[0], [json.bbox[3], json.bbox[2]]]);
         setGeoJsonKey(Date.now().toString());
-        // setTurns([json.features[0].geometry.coordinates.length - 1]);
+        setTurns([json.features[0].geometry.coordinates.length - 1]);
       }
     }
 

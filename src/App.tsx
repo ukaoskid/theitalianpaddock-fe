@@ -8,6 +8,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
+      <Map></Map>
       <div style={{ margin: '1em' }}>
         <Page/>
       </div>
